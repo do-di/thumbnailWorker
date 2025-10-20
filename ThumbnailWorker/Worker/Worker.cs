@@ -14,11 +14,14 @@ namespace ThumbnailWorker.Worker
     {
         private readonly IReadOnlyDictionary<string, IThumbnailStrategy> _thumnailStreategyDic;
         private readonly RabbitMQConfig _rabbitMQConfig;
+        private readonly ILogger<Worker> _logger;
 
-        public Worker(IReadOnlyDictionary<string, IThumbnailStrategy> thumnailStreategyDics, IOptions<RabbitMQConfig> option)
+        public Worker(IReadOnlyDictionary<string, IThumbnailStrategy> thumnailStreategyDics, IOptions<RabbitMQConfig> option, 
+            ILogger<Worker> logger)
         {
             _thumnailStreategyDic = thumnailStreategyDics;
             _rabbitMQConfig = option.Value;
+            _logger = logger;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -40,10 +43,12 @@ namespace ThumbnailWorker.Worker
                 {
                     throw new Exception("something went wrong");
                 }
+
                 var stategy = _thumnailStreategyDic[queueJob.Type.ToLower()];
                 await stategy.CreateThumbnailAsync(queueJob.Payload).ConfigureAwait(false);
             };
             await channel.BasicConsumeAsync("ctl_thumbnail", true, consumer: consumer);
+            await Task.Delay(Timeout.Infinite, stoppingToken);
         }
     }
 }

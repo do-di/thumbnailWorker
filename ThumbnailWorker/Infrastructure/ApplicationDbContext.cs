@@ -18,7 +18,7 @@ namespace ThumbnailWorker.Infrastructure
                 entity.HasKey(e => e.Id);
 
                 entity.Property(e => e.Id)
-                    .HasColumnName("id");
+                    .HasColumnName("Id");
 
                 entity.Property(e => e.ImagePath)
                     .HasColumnName("ImagePath")

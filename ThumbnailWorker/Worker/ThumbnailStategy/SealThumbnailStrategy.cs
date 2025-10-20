@@ -51,11 +51,11 @@ namespace ThumbnailWorker.Worker.ThumbnailStategy
 
             // upload thumbnail to minio
             var thumbnailPath = GenerateThumbnailPath(image.ImagePath);
-            await _storageProvider.UploadFileAsync(outputStream, image.ImagePath).ConfigureAwait(false);
+            await _storageProvider.UploadFileAsync(outputStream, thumbnailPath).ConfigureAwait(false);
 
             // upload thumbnail info to database
             image.ThumbnailPath = thumbnailPath;
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
         }
 
         public string GenerateThumbnailPath(string imagePath)
